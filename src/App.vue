@@ -1,16 +1,16 @@
 <template>
-  <Header class="primary" msg="Requisições Http no vue " />
+  <AppHeader class="primary" msg="Requisições Http no vue " />
   <Task-manager class="primary"/>
 </template>
 
 <script>
-import Header from './components/Header.vue';
+import AppHeader from './components/AppHeader.vue';
 import TaskManager from './components/TaskManager.vue';
 
 export default {
   name: 'App',
   components: {
-    Header,
+    AppHeader,
     TaskManager
   }
 };
