@@ -41,11 +41,6 @@ export default {
     changeStatus(payload) {
       this.taskLocal.status = payload;
     }
-  },
-  watch: {
-    task() {
-      this.taskLocal = this.task;
-    }
   }
 };
 </script>

@@ -6,13 +6,19 @@
       </div>
       <AddTask v-if="showCreateTask" @createTask="addTask" class="mx-auto containerStyle" />
     </div>
-    <TaskList v-if="!isFetching" :tasks="tasks" @editTask="editTask" />
+    <TaskList v-if="!isFetching"
+              :tasks="tasks"
+              :key="reloadTaskList"
+              @editTask="editTask"
+              @deleteTask="deleteTask"
+              @toggleDo="saveTaskEdit"/>
     <p v-else class="mt-5 ml-5">We haven't tasks yet</p>
     <EditTask v-if="isEditing"
               @cancelEdit="hideEdit"
               @taskEdit="saveTaskEdit"
               :task="taskEditing"
-              class="containerStyle mx-auto"/>
+              class="containerStyle mx-auto"
+    />
   </div>
 </template>
 <script>
@@ -37,7 +43,8 @@ export default {
       taskEditing: {},
       isFetching: true,
       isEditing: false,
-      showCreateTask: false
+      showCreateTask: false,
+      reloadTaskList: false
     };
   },
   computed: {
@@ -53,10 +60,9 @@ export default {
   },
   methods: {
     addTask(newTask) {
-      this.isFetching = true;
       axios.post(`${config.urlBase}/tasks`, newTask).then((res) => {
         this.tasks.push(res.data);
-        this.isFetching = false;
+        this.refreshTaskList();
       });
     },
     editTask(payload) {
@@ -64,19 +70,31 @@ export default {
       this.isEditing = true;
     },
     saveTaskEdit(payload) {
-      this.isFetching = true;
       axios.patch(`${config.urlBase}/tasks/${payload.id}`, payload).then(() => {
         const indexToUpdate = this.tasks.findIndex((e) => e.id === payload.id);
         this.tasks.splice(indexToUpdate, 1, payload);
         this.hideEdit();
-        this.isFetching = false;
+        this.refreshTaskList();
       }).catch(() => console.error('Some error occurred when creating a task. Try again!'));
+    },
+    deleteTask(payload) {
+      const confirm = window.confirm(`Have you sure to delete the task "${payload.title}"?`);
+      if (confirm) {
+        axios.delete(`${config.urlBase}/tasks/${payload.id}`).then(() => {
+          const indexToUpdate = this.tasks.findIndex((e) => e.id === payload.id);
+          this.tasks.splice(indexToUpdate, 1);
+          this.refreshTaskList();
+        });
+      }
     },
     hideEdit() {
       this.isEditing = false;
     },
     toggleCreateTask() {
       this.showCreateTask = !this.showCreateTask;
+    },
+    refreshTaskList() {
+      this.reloadTaskList = !this.reloadTaskList;
     }
   }
 };

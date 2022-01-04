@@ -4,8 +4,8 @@
     <span class="my-auto mr-4">{{ statusFormatted }}</span>
     <div class="d-flex">
       <Button @click="edit">Edit</Button>
-      <Button>{{ doButtonText }}</Button>
-      <Button danger>delete</Button>
+      <Button @click="toggleDo">{{ doButtonText }}</Button>
+      <Button @click="deleteTask" danger>delete</Button>
     </div>
   </li>
 </template>
@@ -28,16 +28,16 @@ export default {
   },
   computed: {
     bgTask() {
-      if (this.taskLocal.status === TaskStatus.Done) {
+      if (this.taskLocal.status === TaskStatus.DONE) {
         return 'doneClass';
       }
-      if (this.taskLocal.status === TaskStatus.InProgress) {
+      if (this.taskLocal.status === TaskStatus.IN_PROGRESS) {
         return 'inProgressClass';
       }
       return 'toDoClass';
     },
     doButtonText() {
-      return this.taskLocal.status === TaskStatus.Done ? 'Do again?' : 'Done';
+      return this.taskLocal.status === TaskStatus.DONE ? 'Do again?' : 'Done';
     },
     statusFormatted() {
       return this.task.status.split(' ').map((e) => e.replace(e[0], e[0].toUpperCase())).join(' ');
@@ -46,6 +46,19 @@ export default {
   methods: {
     edit() {
       this.$emit('edit', this.taskLocal);
+    },
+    deleteTask() {
+      this.$emit('delete', this.taskLocal);
+    },
+    toggleDo() {
+      const { status } = this.taskLocal;
+      if (status === TaskStatus.IN_PROGRESS || status === TaskStatus.TO_DO) {
+        this.taskLocal.status = TaskStatus.DONE;
+        this.$emit('toggleDo', this.taskLocal);
+        return;
+      }
+      this.taskLocal.status = TaskStatus.TO_DO;
+      this.$emit('toggleDo', this.taskLocal);
     }
   }
 };

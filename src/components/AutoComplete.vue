@@ -32,9 +32,9 @@ export default {
     return {
       initialValueLocal: '',
       status: [
-        { id: 1, value: taskStatus.ToDo },
-        { id: 2, value: taskStatus.InProgress },
-        { id: 3, value: taskStatus.Done }
+        { id: 1, value: taskStatus.TO_DO },
+        { id: 2, value: taskStatus.IN_PROGRESS },
+        { id: 3, value: taskStatus.DONE }
       ],
       showOptions: false
     };

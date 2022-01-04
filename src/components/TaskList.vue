@@ -3,7 +3,9 @@
     <ul v-if="tasksLocal.length > 0" class="mx-auto py-2 w-75">
       <Task v-for="task in tasksLocal" class="mt-2 mx-auto w-75 border border-white"
             :task="task" :key="task.id"
-            @edit="reEmit"
+            @edit="reEmit('editTask', $event)"
+            @delete="reEmit('deleteTask', $event)"
+            @toggleDo="reEmit('toggleDo', $event)"
       />
     </ul>
   </div>
@@ -26,13 +28,8 @@ export default {
     };
   },
   methods: {
-    reEmit(payload) {
-      this.$emit('editTask', payload);
-    }
-  },
-  watch: {
-    tasks() {
-      this.tasksLocal = [...this.tasks];
+    reEmit(eventName, payload) {
+      this.$emit(eventName, payload);
     }
   }
 };

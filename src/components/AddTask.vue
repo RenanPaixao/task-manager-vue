@@ -21,15 +21,17 @@ export default {
   },
   data() {
     return {
-      taskLocal: { title: '', status: taskStatus.ToDo }
+      taskLocal: { title: '', status: taskStatus.TO_DO }
     };
   },
   methods: {
     createTask() {
-      if (this.taskLocal.title !== '') {
-        this.$emit('createTask', this.taskLocal);
-        this.taskLocal = { title: '', status: taskStatus.ToDo };
+      if (this.taskLocal.title.trim() === '') {
+        window.alert('The title is empty! Fill it');
+        return;
       }
+      this.$emit('createTask', this.taskLocal);
+      this.taskLocal = { title: '', status: taskStatus.TO_DO };
     }
   }
 };
