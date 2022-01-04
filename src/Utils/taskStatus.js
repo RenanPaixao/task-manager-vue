@@ -1,8 +1,8 @@
 class TaskStatus {
-  static ToDo = 'to do';
+  static TO_DO = 'to do';
 
-  static InProgress = 'in progress';
+  static IN_PROGRESS = 'in progress';
 
-  static Done = 'done';
+  static DONE = 'done';
 }
 export default TaskStatus;
