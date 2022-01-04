@@ -1,25 +1,34 @@
 <template>
-  <div class="pb-2 containerSize">
-    <div class="mt-5">
-      <div class="d-flex justify-content-center mb-2">
-        <Button white class="w-25 mt-3" @click="toggleCreateTask">{{plusMinus}} Add task</Button>
+
+  <div v-if="!internetError" class="pb-2 containerSize">
+      <div class="mt-5">
+        <div class="d-flex justify-content-center mb-2">
+          <Button white class="w-25 mt-3" @click="toggleCreateTask">
+            {{ plusMinus }} Add task
+          </Button>
+        </div>
+        <AddTask v-if="showCreateTask" @createTask="addTask" class="mx-auto containerStyle" />
       </div>
-      <AddTask v-if="showCreateTask" @createTask="addTask" class="mx-auto containerStyle" />
+      <TaskList
+        v-if="!isFetching && tasks.length > 0"
+        :tasks="tasks"
+        :key="reloadTaskList"
+        @editTask="editTask"
+        @deleteTask="deleteTask"
+        @toggleDo="saveTaskEdit"
+      />
+      <p v-else class="paragraphStyle mt-5">We haven't tasks yet</p>
+      <EditTask
+        v-if="isEditing"
+        @cancelEdit="hideEdit"
+        @taskEdit="saveTaskEdit"
+        :task="taskEditing"
+        class="containerStyle mx-auto"
+      />
     </div>
-    <TaskList v-if="!isFetching && tasks.length > 0"
-              :tasks="tasks"
-              :key="reloadTaskList"
-              @editTask="editTask"
-              @deleteTask="deleteTask"
-              @toggleDo="saveTaskEdit"/>
-    <p v-else class="paragraphStyle mt-5">We haven't tasks yet</p>
-    <EditTask v-if="isEditing"
-              @cancelEdit="hideEdit"
-              @taskEdit="saveTaskEdit"
-              :task="taskEditing"
-              class="containerStyle mx-auto"
-    />
-  </div>
+    <p v-else class="paragraphStyle mt-5">
+      A network error occurred. Check if Json Server is up.
+    </p>
 </template>
 <script>
 import axios from 'axios';
@@ -44,7 +53,8 @@ export default {
       isFetching: true,
       isEditing: false,
       showCreateTask: false,
-      reloadTaskList: false
+      reloadTaskList: false,
+      internetError: false
     };
   },
   computed: {
@@ -53,10 +63,15 @@ export default {
     }
   },
   created() {
-    axios.get(`${config.urlBase}/tasks`).then((e) => {
-      this.tasks = e.data;
-      this.isFetching = false;
-    });
+    axios
+      .get(`${config.urlBase}/tasks`)
+      .then((e) => {
+        this.tasks = e.data;
+        this.isFetching = false;
+      })
+      .catch(() => {
+        this.internetError = true;
+      });
   },
   methods: {
     addTask(newTask) {
@@ -70,12 +85,15 @@ export default {
       this.isEditing = true;
     },
     saveTaskEdit(payload) {
-      axios.patch(`${config.urlBase}/tasks/${payload.id}`, payload).then(() => {
-        const indexToUpdate = this.tasks.findIndex((e) => e.id === payload.id);
-        this.tasks.splice(indexToUpdate, 1, payload);
-        this.hideEdit();
-        this.refreshTaskList();
-      }).catch(() => console.error('Some error occurred when creating a task. Try again!'));
+      axios
+        .patch(`${config.urlBase}/tasks/${payload.id}`, payload)
+        .then(() => {
+          const indexToUpdate = this.tasks.findIndex((e) => e.id === payload.id);
+          this.tasks.splice(indexToUpdate, 1, payload);
+          this.hideEdit();
+          this.refreshTaskList();
+        })
+        .catch(() => console.error('Some error occurred when creating a task. Try again!'));
     },
     deleteTask(payload) {
       const confirm = window.confirm(`Have you sure to delete the task "${payload.title}"?`);
@@ -104,10 +122,10 @@ export default {
   width: 55%;
   border: 2px solid white;
 }
-.containerSize{
+.containerSize {
   min-height: 710px;
 }
-.paragraphStyle{
+.paragraphStyle {
   text-align: center;
   color: #fff;
 }
