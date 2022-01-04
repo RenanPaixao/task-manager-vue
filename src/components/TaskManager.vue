@@ -6,13 +6,13 @@
       </div>
       <AddTask v-if="showCreateTask" @createTask="addTask" class="mx-auto containerStyle" />
     </div>
-    <TaskList v-if="!isFetching"
+    <TaskList v-if="!isFetching && tasks.length > 0"
               :tasks="tasks"
               :key="reloadTaskList"
               @editTask="editTask"
               @deleteTask="deleteTask"
               @toggleDo="saveTaskEdit"/>
-    <p v-else class="mt-5 ml-5">We haven't tasks yet</p>
+    <p v-else class="paragraphStyle mt-5">We haven't tasks yet</p>
     <EditTask v-if="isEditing"
               @cancelEdit="hideEdit"
               @taskEdit="saveTaskEdit"
@@ -106,5 +106,9 @@ export default {
 }
 .containerSize{
   min-height: 710px;
+}
+.paragraphStyle{
+  text-align: center;
+  color: #fff;
 }
 </style>
